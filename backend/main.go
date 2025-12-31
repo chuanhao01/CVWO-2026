@@ -1,10 +1,9 @@
 package main
 
 import (
-	backend "backend/db"
-	"fmt"
+	"backend/db"
 )
 
 func main() {
-	fmt.Println(backend.Foo())
+	db.CreateUserByUsernameAndEmail("bob", "bob@test.com", "no")
 }
