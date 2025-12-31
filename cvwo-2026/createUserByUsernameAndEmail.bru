@@ -1,0 +1,19 @@
+meta {
+  name: createUserByUsernameAndEmail
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/createUserByUsernameAndEmail
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "bob1",
+    "password": "password",
+    "email": "bob1@test.com"
+  }
+}

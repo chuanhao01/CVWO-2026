@@ -12,11 +12,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func getLogger() *slog.Logger {
+	return utils.GetLogger().WithGroup("db").WithGroup("users")
+}
+
 // Creates a user in the user table
 // Mainly used when registering a new user by username, email and password
 func CreateUserByUsernameAndEmail(username string, email string, password string) error {
-	logger := utils.GetLogger()
-	logger = logger.WithGroup("db").WithGroup("users").With(slog.String("username", username), slog.String("email", email))
+	logger := getLogger().With(slog.String("username", username), slog.String("email", email))
 
 	logger.Info("Creating user")
 

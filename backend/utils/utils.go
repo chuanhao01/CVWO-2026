@@ -9,7 +9,9 @@ import (
 )
 
 type envVar struct {
-	DB_URL string
+	APP_ENV string
+	DB_URL  string
+	GIN_URL string
 }
 
 var envVars *envVar
@@ -26,6 +28,7 @@ func loadEnv() {
 	if "" == app_env {
 		app_env = "DEV"
 	}
+	envVars.APP_ENV = app_env
 
 	logger.Info("loadEnv", slog.String("APP_ENV", app_env))
 
@@ -40,8 +43,10 @@ func GetEnv() *envVar {
 	logger := getLogger()
 
 	if envVars == nil {
+		envVars = &envVar{}
 		loadEnv()
-		envVars = &envVar{DB_URL: os.Getenv("DB_URL")}
+		envVars.DB_URL = os.Getenv("DB_URL")
+		envVars.GIN_URL = os.Getenv("GIN_URL")
 		logger.Info("Loaded envVars")
 	}
 	return envVars
