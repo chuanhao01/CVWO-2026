@@ -9,9 +9,10 @@ import (
 )
 
 type envVar struct {
-	APP_ENV string
-	DB_URL  string
-	GIN_URL string
+	APP_ENV      string
+	FRONTEND_URL string
+	DB_URL       string
+	GIN_URL      string
 }
 
 var envVars *envVar
@@ -45,6 +46,7 @@ func GetEnv() *envVar {
 	if envVars == nil {
 		envVars = &envVar{}
 		loadEnv()
+		envVars.FRONTEND_URL = os.Getenv("FRONTEND_URL")
 		envVars.DB_URL = os.Getenv("DB_URL")
 		envVars.GIN_URL = os.Getenv("GIN_URL")
 		logger.Info("Loaded envVars")
