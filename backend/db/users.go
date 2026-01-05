@@ -3,7 +3,6 @@
 package db
 
 import (
-	"backend/utils"
 	"context"
 	"errors"
 	"log/slog"
@@ -12,14 +11,10 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func getLogger() *slog.Logger {
-	return utils.GetLogger().WithGroup("db").WithGroup("users")
-}
-
 // Creates a user in the user table
 // Mainly used when registering a new user by username, email and password
-func CreateUserByUsernameAndEmail(username string, email string, password string) error {
-	logger := getLogger().With(slog.String("username", username), slog.String("email", email))
+func CreateUserByUsernameAndEmail(logger *slog.Logger, username string, email string, password string) error {
+	logger = logger.With(slog.String("username", username), slog.String("email", email))
 
 	logger.Info("Creating user")
 
@@ -43,4 +38,38 @@ func CreateUserByUsernameAndEmail(username string, email string, password string
 		return errors.New("Unable to create user")
 	}
 	return nil
+}
+
+func IsEmailUnique(logger *slog.Logger, email string) (bool, error) {
+	logger = logger.With(slog.String("email", email))
+
+	var exists bool
+	conn := GetConn()
+	err := conn.QueryRow(
+		context.Background(),
+		`SELECT EXISTS (SELECT 1 FROM users WHERE email = @email)`,
+		pgx.NamedArgs{"email": email},
+	).Scan(&exists)
+	if err != nil {
+		logger.Warn("Unable to check email")
+		return false, errors.New("Unable to query email")
+	}
+	return !exists, nil
+}
+
+func IsUsernameUnique(logger *slog.Logger, username string) (bool, error) {
+	logger = logger.With(slog.String("username", username))
+
+	var exists bool
+	conn := GetConn()
+	err := conn.QueryRow(
+		context.Background(),
+		`SELECT EXISTS (SELECT 1 FROM users WHERE username = @username)`,
+		pgx.NamedArgs{"username": username},
+	).Scan(&exists)
+	if err != nil {
+		logger.With(slog.String("err", err.Error())).Warn("Unable to check username")
+		return false, errors.New("Unable to query username")
+	}
+	return !exists, nil
 }
