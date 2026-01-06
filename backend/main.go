@@ -33,6 +33,7 @@ func main() {
 	router.POST("/createUserByUsernameAndEmail", createUserByUsernameAndEmail)
 	router.POST("/checkUsername", checkUsername)
 	router.POST("/checkEmail", checkEmail)
+	router.POST("/verifyUserLogin", verifyUserLogin)
 
 	router.Run(envVars.GIN_URL)
 }
@@ -42,7 +43,6 @@ func main() {
 // Helper to create the logger used by all handlers and adds context
 func getHandlerLogger(handler string, c *gin.Context) *slog.Logger {
 	logger := utils.GetLogger().WithGroup(handler)
-	logger = logger.With(slog.String("RequestStartTime", c.Request.Header["Request-Start-Time"][0]))
 	return logger
 }
 
@@ -123,4 +123,25 @@ func checkEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"isUnique": isUnique})
+}
+
+type verifyUserLoginBody struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func verifyUserLogin(c *gin.Context) {
+	logger := getHandlerLogger("verifyUserLogin", c)
+	var json verifyUserLoginBody
+	if handlerBindJsonHelper(&json, c, logger) {
+		return
+	}
+
+	match, err := db.VerifyUserLogin(logger, json.Username, json.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Unable to verify user login"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"match": match})
 }

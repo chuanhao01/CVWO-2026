@@ -20,7 +20,7 @@ func CreateUserByUsernameAndEmail(logger *slog.Logger, username string, email st
 
 	hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
 	if err != nil {
-		logger.Warn("Unable to hash password", "err", err)
+		logger.With(slog.String("err", err.Error())).Warn("Unable to hash password")
 		return errors.New("Unable to create user")
 	}
 
@@ -72,4 +72,28 @@ func IsUsernameUnique(logger *slog.Logger, username string) (bool, error) {
 		return false, errors.New("Unable to query username")
 	}
 	return !exists, nil
+}
+
+func VerifyUserLogin(logger *slog.Logger, username string, password string) (bool, error) {
+	logger = logger.With(slog.String("username", username))
+	verifyUserLoginError := errors.New("Unable to check user password")
+
+	var check_password_hash string
+
+	conn := GetConn()
+	err := conn.QueryRow(
+		context.Background(),
+		`SELECT password_hash FROM users WHERE username = @username`,
+		pgx.NamedArgs{"username": username},
+	).Scan(&check_password_hash)
+	if err != nil {
+		logger.With(slog.String("err", err.Error())).Warn("Unable to check user password")
+		return false, verifyUserLoginError
+	}
+	match, _, err := argon2id.CheckHash(password, check_password_hash)
+	if err != nil {
+		logger.With(slog.String("err", err.Error())).Warn("Unable to check password hash")
+		return false, verifyUserLoginError
+	}
+	return match, nil
 }
