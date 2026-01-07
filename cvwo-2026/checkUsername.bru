@@ -1,0 +1,17 @@
+meta {
+  name: checkUsername
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/checkUsername
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "bob"
+  }
+}

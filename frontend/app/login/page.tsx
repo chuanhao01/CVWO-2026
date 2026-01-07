@@ -10,83 +10,59 @@ import * as z from "zod";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { checkUsername, checkEmail, register } from "./actions";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { login } from "./actions";
 import { useRouter } from "next/navigation";
 
 export const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters.")
-    .max(50, "Username is too long")
-    .refine(checkUsername, { error: "Username already taken" }),
-  email: z
-    .email()
-    .min(10, "Email must be at least 10 characters.")
-    .max(200, "Email is too long")
-    .refine(checkEmail, { error: "Email already used" }),
-  password: z
-    .string()
-    .min(5, "Password must be atleast 5 characters")
-    .max(50, "Password is too long"),
+  username: z.string(),
+  password: z.string(),
 });
 
-export default function Register() {
+export default function Page() {
   const router = useRouter();
 
-  const formId = "register-form";
+  const formId = "login-form";
   const [disabled, setDisabled] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
-    mode: "onBlur",
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
     },
     disabled,
   });
   const formSubmitHandler = form.handleSubmit(async (data) => {
     setDisabled(true);
-    // if register was unsuccessful
-    if (!(await register(data))) {
-      setIsRegisterErrorDialogOpen(true);
+    if (!(await login(data))) {
+      setIsErrorDialogOpen(true);
     } else {
-      router.push("/");
+      router.push("/home");
     }
     setDisabled(false);
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isRegisterErrorDialogOpen, setIsRegisterErrorDialogOpen] =
-    useState(false);
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center">
-      <Dialog
-        open={isRegisterErrorDialogOpen}
-        onOpenChange={setIsRegisterErrorDialogOpen}
-      >
+      <Dialog open={isErrorDialogOpen} onOpenChange={setIsErrorDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              <DialogTitle className="text-xl font-bold">
-                Account Registration Failed
-              </DialogTitle>
+            <DialogTitle className="text-xl font-bold">
+              Login Failed
             </DialogTitle>
-            <DialogDescription>
-              Something unexpected happened while trying to create your account,
-              please try again.
-            </DialogDescription>
+            <DialogDescription>Please Try Again</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
 
       <Card className="gap-3">
         <CardHeader>
-          <CardTitle>Register for an Account</CardTitle>
+          <CardTitle>Login</CardTitle>
         </CardHeader>
         <form id={formId} onSubmit={formSubmitHandler}>
           <CardContent>
@@ -102,27 +78,6 @@ export default function Register() {
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     placeholder="Username"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </CardContent>
-          <CardContent>
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Email"
                     autoComplete="off"
                   />
                   {fieldState.invalid && (

@@ -129,17 +129,25 @@ For the `Comments` table, since any comment must be created by a user in some si
 #pagebreak()
 
 MAYBE
-- Get github actions to build and deploy
-  - Build has to be custom commands, running on specific dir and setting up the `.env` files
+- Implement timed verification emails
+
 
 TODO
-- Register with username, email and password
-  - Link oauth afterwards
-- Register with oauth first
-  - Need to add username to continue
-  - Some flag, register with oauth, need additional setup
+
+
 
 DONE
+
+Register
+FE
+- on focus change, check username and email is unique
+- Minimum and max string length
+- show error message
+- if form action fails, show popup and allow them to submit again
+
+BE
+- Check minimum length
+- regex for email
 
 
 = Planning
@@ -177,3 +185,4 @@ BE
 - #link(
     "https://www.dash0.com/guides/logging-in-go-with-slog#contextual-logging-patterns-with-slog",
   )[For learning go logging]
+https://dev.to/supertokens/implementing-the-right-email-verification-flow-2hcj

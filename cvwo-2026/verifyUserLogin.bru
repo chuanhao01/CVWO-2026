@@ -1,0 +1,18 @@
+meta {
+  name: verifyUserLogin
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/verifyUserLogin
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "bob3",
+    "password": "no"
+  }
+}

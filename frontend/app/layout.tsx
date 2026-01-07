@@ -16,13 +16,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="z-50 flex h-13 w-full items-center p-4 lg:sticky lg:top-0">
+          <header className="z-50 flex h-15 w-full items-center p-4 lg:sticky lg:top-0">
             <p>r/NUS</p>
             <div className="ml-auto">
               <ModeToggle />
             </div>
-          </div>
-          <div className="hidden h-13 lg:block"></div>
+          </header>
+          <div className="hidden h-15 lg:block"></div>
           <div>{children}</div>
         </ThemeProvider>
       </body>

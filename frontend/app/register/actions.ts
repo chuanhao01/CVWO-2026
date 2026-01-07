@@ -13,7 +13,7 @@ export async function register(
 ): Promise<boolean> {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/createUserByUsernameAndEmail`,
+      `${process.env.BACKEND_URL}/createUserByUsernameAndEmail`,
       {
         method: "POST",
         body: JSON.stringify(data),

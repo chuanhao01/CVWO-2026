@@ -1,0 +1,17 @@
+meta {
+  name: checkEmail
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/checkEmail
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "bob1@test.com"
+  }
+}
